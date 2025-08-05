@@ -160,7 +160,6 @@ if __name__ == '__main__':
             board.player_x += math.cos(math.radians(board.player_angle)) * board.max_speed  # speed
             board.player_y += math.sin(math.radians(board.player_angle)) * board.max_speed  # speed
 
-            #print(ticks)
             '''#for event in pygame.event.get():
              #   if event.type == pygame.QUIT:
               #      break
