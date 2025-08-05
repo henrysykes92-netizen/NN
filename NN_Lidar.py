@@ -148,7 +148,6 @@ if __name__ == '__main__':
             ticks += 1
 
             if action == 0:
-                # player.score += 1/(board.hunger * board.fps)
                 speed = board.max_speed
             elif action == 1:
                 speed = 0
@@ -159,23 +158,6 @@ if __name__ == '__main__':
 
             board.player_x += math.cos(math.radians(board.player_angle)) * board.max_speed  # speed
             board.player_y += math.sin(math.radians(board.player_angle)) * board.max_speed  # speed
-
-            '''#for event in pygame.event.get():
-             #   if event.type == pygame.QUIT:
-              #      break
-            if player.found != found:
-                found = player.found
-                lidar.objects = [None] * int(lidar.memory / 40)
-
-            keys = pygame.key.get_pressed()
-            board.player_angle += (keys[pygame.K_RIGHT] - keys[pygame.K_LEFT]) * board.max_rotate
-            speed = keys[pygame.K_UP] * board.max_speed
-            # speed = ((keys[pygame.K_UP]*player.forward) - keys[pygame.K_DOWN]*player.backward) * board.max_speed
-            # speed = ((keys[pygame.K_UP]) - keys[pygame.K_DOWN]) * board.max_speed
-
-            board.player_x += math.cos(math.radians(board.player_angle)) * speed  # * player.move_x
-            board.player_y += math.sin(math.radians(board.player_angle)) * speed  # * player.move_y
-            '''
 
             run.step()
             #if loop % rend_loop == 0:
