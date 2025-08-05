@@ -42,7 +42,6 @@ class QNetwork(nn.Module):
         )
         '''
     def forward(self, x):
-        print(len(x))
         return self.model(x)
 
 def flatten(lst):
@@ -91,16 +90,9 @@ def sarsa_update(model, optimiser, criterion, state, action, reward, next_state,
 if __name__ == '__main__':
     lidar = Lidar()
 
-    s = [
-        player.hunger,
-        round(board.player_x, 1),
-        round(board.player_y, 1),
-        round(board.obj_x, 1),
-        round(board.obj_y, 1)
-    ]
+    s = [player.hunger, round(board.player_x, 1), round(board.player_y, 1), round(board.obj_x, 1), round(board.obj_y, 1)]
     s += list(flatten(lidar.area))
     s += list(flatten(lidar.objects))
-
     input_size = len(s)
 
     output_size = 3
@@ -145,6 +137,8 @@ if __name__ == '__main__':
             lidar.render_init()
 
         state = get_state(board, player).unsqueeze(0)
+        input_size = state.shape[1]
+        model = QNetwork(input_size, hidden_size, output_size)
         action = select_action(state, model, epsilon, output_size)
         prev_score = player.score
 
