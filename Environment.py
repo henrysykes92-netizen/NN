@@ -20,7 +20,7 @@ class Board:
         self.tile_size = self.width / self.map_size
         self.view_range = self.width / 1.5
         self.fov = 60  # 90
-        self.no_ofrays = 5
+        self.no_ofrays = 8
         self.max_speed = 1.5 * self.map_size / math.pi
         self.max_rotate = 15  # math.pi
         self.fps = 12

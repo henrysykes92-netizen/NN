@@ -45,9 +45,6 @@ class QNetwork(nn.Module):
 
 def get_state(board, player, rays):
     s = [round(board.player_x, 1), round(board.player_y, 1), round(board.obj_x, 1), round(board.obj_y, 1), player.hunger]
-    for v in s:
-        print(v)
-    input()
     for ray in rays:
         try:
             s.append(round(ray.distance, 1))

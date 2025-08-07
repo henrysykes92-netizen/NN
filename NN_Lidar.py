@@ -1,3 +1,5 @@
+import torch
+
 from Lidar import *
 
 class ReplayBuffer:
@@ -52,17 +54,14 @@ def flatten(lst):
             yield item
 
 def get_state(board, player):
-    s = [
-        player.hunger,
-        round(board.player_x, 1),
-        round(board.player_y, 1),
-        round(board.obj_x, 1),
-        round(board.obj_y, 1)
-    ]
-    # Flatten lidar.area and lidar.objects and append to state
-    s += list(flatten(lidar.area))
-    s += list(flatten(lidar.objects))
-    return torch.tensor(s, dtype=torch.float32)
+    a = [player.hunger,
+         round(board.player_x, 1),
+         round(board.player_y, 1),
+         round(board.obj_x, 1),
+         round(board.obj_y, 1)]
+    b = list(flatten(lidar.area))
+    c = list(flatten(lidar.objects))
+    return torch.tensor(a+b+c, dtype=torch.float32)
 
 def select_action(state, model, epsilon, output_size):
     if random.random() < epsilon:
@@ -88,15 +87,19 @@ def sarsa_update(model, optimiser, criterion, state, action, reward, next_state,
     optimiser.step()
 
 if __name__ == '__main__':
+    pygame.init()
+    clock = pygame.time.Clock()
+
+    run = Run()
     lidar = Lidar()
 
-    s = [player.hunger, round(board.player_x, 1), round(board.player_y, 1), round(board.obj_x, 1), round(board.obj_y, 1)]
-    s += list(flatten(lidar.area))
-    s += list(flatten(lidar.objects))
-    input_size = len(s)
+    a = [player.hunger, round(board.player_x, 1), round(board.player_y, 1), round(board.obj_x, 1), round(board.obj_y, 1)]
+    b = list(flatten(lidar.area))
+    c = list(flatten(lidar.objects))
+    input_size = len(a+b+c)
 
     output_size = 3
-    hidden_size = 128 #360
+    hidden_size = 360
     gamma = 0.95
     epsilon = 1
     epsilon_decay = 0.99992  # 1 + math.log(0.9999, board.hunger * board.fps)
@@ -109,11 +112,8 @@ if __name__ == '__main__':
     buffer = ReplayBuffer(capacity=10000)
     batch_size = 64
 
-    # prev_score = 0
-
-    clock = pygame.time.Clock()
     loop = 0
-    rend_loop = 0.1  # 5000
+    rend_loop = 500  # 5000
     non_r = 500
 
     with open("Lidar_Data\\Values.txt", "a", newline="") as f:
@@ -123,22 +123,27 @@ if __name__ == '__main__':
         f.write(f'\nLoop\tScore\t\tFound\tTicks\tEpsilon')
 
     # Training Loop
-    loop = 0
-
-    pygame.init()
-    clock = pygame.time.Clock()
-
+    prev_f = player.found
     while True:
         loop += 1
         ticks = 0
         print(f'Loop: {loop}')
+
+        board.__init__()
+        player.__init__(x=board.player_x, y=board.player_y, angle=board.player_angle)
+        offsets = []
+        for i in np.arange(-board.fov / 2, board.fov / 2 + 1, board.fov / board.no_ofrays):
+            offsets.append(i)
+            rays[int((i - 1) * 2 / board.fov)].__init__(start_x=board.player_x, start_y=board.player_y,
+                                                        start_angle=board.player_angle, offset=i)
+
         run = Run()
         if loop % rend_loop == 0:
             lidar.render_init()
 
         state = get_state(board, player).unsqueeze(0)
-        input_size = state.shape[1]
-        model = QNetwork(input_size, hidden_size, output_size)
+        #input_size = state.shape[1]
+        #model = QNetwork(input_size, hidden_size, output_size)
         action = select_action(state, model, epsilon, output_size)
         prev_score = player.score
 
@@ -160,19 +165,23 @@ if __name__ == '__main__':
             board.player_y += math.sin(math.radians(board.player_angle)) * board.max_speed  # speed
 
             run.step()
-            #if loop % rend_loop == 0:
-             #   run.render_step()
+            if loop % rend_loop == 0:
+                lidar.render_step()
+                pygame.display.update()
+                clock.tick(board.fps)
 
             for ray in rays:
-                #print(ray.object)
                 if ray.object == (125, 125, 0):
-                    #print((ray.end_x, ray.end_y))
                     lidar.bounce(ray.end_x, ray.end_y, False)
                 if ray.object == (0, 0, 255):
                     lidar.bounce(ray.end_x, ray.end_y, True)
 
+            if prev_f != player.found:
+                lidar.objects = [0] * int(lidar.memory / 4)
+                prev_f = player.found
+
             if loop % rend_loop == 0:
-                lidar.render()
+                lidar.render_step()
                 pygame.display.flip()
                 clock.tick(board.fps)
 
@@ -235,4 +244,4 @@ if __name__ == '__main__':
              #   print(f'dead\t{player.score}')
               #  break
 
-        pygame.quit()
+        #pygame.quit()
