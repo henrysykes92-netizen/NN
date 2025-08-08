@@ -1,14 +1,10 @@
-import random
-
-import pygame
-
 from Lidar import *
 
 class Edge():
     def __init__(self):
         self.horiz = []
         self.vert = []
-        for i in range(board.map_size):
+        for i in range(board.map_size-1):
             self.horiz.append([])
             self.vert.append([])
 
@@ -45,7 +41,7 @@ if __name__ == '__main__':
             for p in lidar.area:
                 if round(p[0], 4) % board.tile_size == 0:
                     #print(int(p[0]//board.tile_size))
-                    edge.vert[int(p[0]//board.tile_size)].append(p)
+                    edge.vert[int(round(p[0], 4)//board.tile_size)-1].append([round(p[0], 4), round(p[1], 4)])
 
         #for p in lidar.area:
             #print(round(p[0], 4), round(p[1], 4))
