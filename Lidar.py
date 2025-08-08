@@ -3,14 +3,27 @@ import math
 from Environment import *
 
 class Lidar:
-    def __init__(self):
-        self.memory = 200
-        self.area = [[0,0]] * self.memory
-        self.objects = [[0,0]] * int(self.memory / 4)
+    def __init__(self, mem=True):
+        self.mem = mem
+        if self.mem == True:
+            self.memory = 200
+            self.area = [[0,0]] * self.memory
+            self.objects = [[0,0]] * int(self.memory / 4)
+        else:
+            self.area = []
+            self.objects = []
+
     def render_init(self):
         pygame.init()
         self.clock = pygame.time.Clock()
         self.area_surf = pygame.display.set_mode((board.width, board.height))
+
+    def step(self):
+        for ray in rays:
+            if ray.object == (125, 125, 0):
+                self.bounce(ray.end_x, ray.end_y, False)
+            if ray.object == (0, 0, 255):
+                self.bounce(ray.end_x, ray.end_y, True)
 
     def bounce(self, x, y, obj=False):
         self.point_x = x
@@ -18,10 +31,12 @@ class Lidar:
         p = [self.point_x,self.point_y]
         if obj == True:
             self.objects.append(p)
-            self.objects.pop(0)
+            if self.mem == True:
+                self.objects.pop(0)
         else:
             self.area.append(p)
-            self.area.pop(0)
+            if self.mem == True:
+                self.area.pop(0)
     def render_step(self):
         self.area_surf.fill((0, 0, 0))
         for point in self.area:
@@ -59,12 +74,7 @@ if __name__ == '__main__':
         board.player_y += math.sin(math.radians(board.player_angle)) * speed
 
         run.step()
-
-        for ray in rays:
-            if ray.object == (125, 125, 0):
-                lidar.bounce(ray.end_x, ray.end_y, False)
-            if ray.object == (0, 0, 255):
-                lidar.bounce(ray.end_x, ray.end_y, True)
+        lidar.step()
 
         if prev_f != player.found:
             lidar.objects = [0] * int(lidar.memory / 4)

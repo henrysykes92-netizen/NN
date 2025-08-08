@@ -38,9 +38,7 @@ class Board:
         self.board = []
         self.count = 0
 
-        self.maze()
-
-    def maze(self, rnd=False):
+    def maze(self, rnd=False, bll=True):
         if rnd == False:
             self.board = [['#', '#', '#', '#', '#', '#', '#', '#'],
                           ['#', ' ', '#', '#', ' ', ' ', '#', '#'],
@@ -50,7 +48,6 @@ class Board:
                           ['#', ' ', '#', '#', ' ', ' ', ' ', '#'],
                           ['#', ' ', ' ', ' ', ' ', ' ', '#', '#'],
                           ['#', '#', '#', '#', '#', '#', '#', '#']]
-
 
         else:
             for i in range(self.map_size):
@@ -88,7 +85,8 @@ class Board:
                 #print(val)
                 self.board[val[0]][val[1]] = ' '
 
-        self.ball()
+        if bll == True:
+            self.ball()
 
     def no_ofAreas(self, grid):
         if len(grid) == 0:
@@ -325,7 +323,9 @@ class Run:
 os.makedirs("frames", exist_ok=True)
 frame_count = 0
 
+
 board = Board()
+board.maze(rnd=True,bll=False)
 player = Player(x=board.player_x, y=board.player_y, angle=board.player_angle)
 rays = []
 offsets = []
