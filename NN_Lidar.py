@@ -117,7 +117,6 @@ if __name__ == '__main__':
 
     # prev_score = 0
 
-    clock = pygame.time.Clock()
     loop = 0
     rend_loop = 1 #5000
     non_r = 500
@@ -260,4 +259,5 @@ if __name__ == '__main__':
              #   print(f'dead\t{player.score}')
               #  break
 
-        pygame.quit()
+        if loop % rend_loop == 0:
+            pygame.quit()
