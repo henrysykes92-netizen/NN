@@ -1,10 +1,12 @@
+import itertools
+
 from Environment import *
 
 class Lidar:
     def __init__(self):
         self.memory = 200
-        self.area = [0] * self.memory # None
-        self.objects = [0] * int(self.memory / 4) # None
+        self.area = list(itertools.repeat([0,0], self.memory))
+        self.objects = list(itertools.repeat([0,0], int(self.memory / 4)))
     def render_init(self):
         pygame.init()
         self.clock = pygame.time.Clock()

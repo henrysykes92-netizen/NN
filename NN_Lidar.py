@@ -42,7 +42,6 @@ class QNetwork(nn.Module):
         )
         '''
     def forward(self, x):
-        print(len(x))
         return self.model(x)
 
 def flatten(lst):
@@ -100,7 +99,6 @@ if __name__ == '__main__':
     ]
     s += list(flatten(lidar.area))
     s += list(flatten(lidar.objects))
-
     input_size = len(s)
 
     output_size = 3
@@ -121,7 +119,7 @@ if __name__ == '__main__':
 
     clock = pygame.time.Clock()
     loop = 0
-    rend_loop = 0.1  # 5000
+    rend_loop = 1 #5000
     non_r = 500
 
     with open("Lidar_Data\\Values.txt", "a", newline="") as f:
@@ -133,10 +131,12 @@ if __name__ == '__main__':
     # Training Loop
     loop = 0
 
-    pygame.init()
-    clock = pygame.time.Clock()
+    #pygame.init()
+    #clock = pygame.time.Clock()
 
     while True:
+        pygame.init()
+        clock = pygame.time.Clock()
         loop += 1
         ticks = 0
         print(f'Loop: {loop}')
