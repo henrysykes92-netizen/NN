@@ -124,9 +124,9 @@ if __name__ == '__main__':
         if loop % rend_loop == 0:
             run.render_init()
 
-            #frame_dir = f"Data/Loop_{loop}_frames"
-            #os.makedirs(frame_dir, exist_ok=True)
-            #frame_count = 0
+            frame_dir = f"Data/Loop_{loop}_frames"
+            os.makedirs(frame_dir, exist_ok=True)
+            frame_count = 0
 
             with open(str(f'Data\\Loop_{loop}_Training_Data.txt'), "w", newline="") as f:
                 for row in board.board:
@@ -161,8 +161,8 @@ if __name__ == '__main__':
                 run.render_step()
                 pygame.display.update()
                 clock.tick(board.fps)
-                #pygame.image.save(pygame.display.get_surface(), f"{frame_dir}/frame_{frame_count:04d}.png")
-                #frame_count += 1
+                pygame.image.save(pygame.display.get_surface(), f"{frame_dir}/frame_{frame_count:04d}.png")
+                frame_count += 1
 
             next_state = get_state(board, player, rays).unsqueeze(0)
             if player.found == 10:
@@ -211,10 +211,10 @@ if __name__ == '__main__':
             pygame.quit()
             torch.save(model.state_dict(), f"Data\\Loop_{loop}_Model.pkl")
             images = []
-            #for i in range(frame_count):
-             #   filename = f"{frame_dir}/frame_{i:04d}.png"
-              #  images.append(iio.v3.imread(filename))
-            #imageio.mimsave(f"Data/Loop_{loop}_render.gif", images, fps=board.fps)
+            for i in range(frame_count):
+                 filename = f"{frame_dir}/frame_{i:04d}.png"
+                 images.append(iio.v3.imread(filename))
+                 imageio.mimsave(f"Data/Loop_{loop}_render.gif", images, fps=board.fps)
 
         with open("Data\\Values.txt", "a", newline="") as f:
             f.write(f'\n{loop}\t{round(player.score,6):.6f}\t{player.found}\t{ticks}\t{epsilon}')

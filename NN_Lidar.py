@@ -118,8 +118,8 @@ if __name__ == '__main__':
     # prev_score = 0
 
     loop = 0
-    rend_loop = 1 #5000
-    non_r = 500
+    rend_loop = 2000
+    non_r = 1000
 
     with open("Lidar_Data\\Values.txt", "a", newline="") as f:
         f.write(f'Gamma: {gamma}')
@@ -129,19 +129,37 @@ if __name__ == '__main__':
 
     # Training Loop
     loop = 0
-
-    #pygame.init()
-    #clock = pygame.time.Clock()
+    pygame.init()
+    clock = pygame.time.Clock()
 
     while True:
-        pygame.init()
-        clock = pygame.time.Clock()
         loop += 1
         ticks = 0
         print(f'Loop: {loop}')
+        board.__init__()
+        player.__init__(x=board.player_x, y=board.player_y, angle=board.player_angle)
+
+        offsets = []
+        for i in np.arange(-board.fov / 2, board.fov / 2 + 1, board.fov / board.no_ofrays):
+            offsets.append(i)
+            rays[int((i - 1) * 2 / board.fov)].__init__(start_x=board.player_x, start_y=board.player_y,
+                                                        start_angle=board.player_angle, offset=i)
+
         run = Run()
         if loop % rend_loop == 0:
             lidar.render_init()
+
+            frame_dir = f"Data/Loop_{loop}_frames"
+            os.makedirs(frame_dir, exist_ok=True)
+            frame_count = 0
+
+            with open(str(f'Lidar_Data\\Loop_{loop}_Training_Data.txt'), "w", newline="") as f:
+                for row in board.board:
+                    f.write(str(row)+'\n')
+                header = ['p_x', '\tp_y', '\to_x', '\to_y', '\thunger'] + [f'\tray_{i}_values' for i in range(len(rays))] + ['\taction']
+                for h in header:
+                    f.write(str(h))
+                f.write('\n')
 
         state = get_state(board, player).unsqueeze(0)
         action = select_action(state, model, epsilon, output_size)
@@ -184,8 +202,6 @@ if __name__ == '__main__':
             '''
 
             run.step()
-            #if loop % rend_loop == 0:
-             #   run.render_step()
 
             for ray in rays:
                 #print(ray.object)
@@ -199,6 +215,8 @@ if __name__ == '__main__':
                 lidar.render()
                 pygame.display.flip()
                 clock.tick(board.fps)
+                pygame.image.save(pygame.display.get_surface(), f"{frame_dir}/frame_{frame_count:04d}.png")
+                frame_count += 1
 
             next_state = get_state(board, player).unsqueeze(0)
             if player.found == 10:
@@ -247,10 +265,10 @@ if __name__ == '__main__':
             pygame.quit()
             torch.save(model.state_dict(), f"Lidar_Data\\Loop_{loop}_Model.pkl")
             images = []
-            # for i in range(frame_count):
-            #   filename = f"{frame_dir}/frame_{i:04d}.png"
-            #  images.append(iio.v3.imread(filename))
-            # imageio.mimsave(f"Data/Loop_{loop}_render.gif", images, fps=board.fps)
+            for i in range(frame_count):
+               filename = f"{frame_dir}/frame_{i:04d}.png"
+               images.append(iio.v3.imread(filename))
+               imageio.mimsave(f"Data/Loop_{loop}_render.gif", images, fps=board.fps)
 
         with open("Lidar_Data\\Values.txt", "a", newline="") as f:
             f.write(f'\n{loop}\t{round(player.score, 6):.6f}\t{player.found}\t{ticks}\t{epsilon}')
@@ -258,6 +276,3 @@ if __name__ == '__main__':
             #if player.alive == False:
              #   print(f'dead\t{player.score}')
               #  break
-
-        if loop % rend_loop == 0:
-            pygame.quit()
