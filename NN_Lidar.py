@@ -118,7 +118,7 @@ if __name__ == '__main__':
     # prev_score = 0
 
     loop = 0
-    rend_loop = 2000
+    rend_loop = 100
     non_r = 1000
 
     with open("Lidar_Data\\Values.txt", "a", newline="") as f:
@@ -136,6 +136,7 @@ if __name__ == '__main__':
         loop += 1
         ticks = 0
         print(f'Loop: {loop}')
+        lidar.__init__()
         board.__init__()
         player.__init__(x=board.player_x, y=board.player_y, angle=board.player_angle)
 
@@ -149,7 +150,7 @@ if __name__ == '__main__':
         if loop % rend_loop == 0:
             lidar.render_init()
 
-            frame_dir = f"Data/Loop_{loop}_frames"
+            frame_dir = f"Lidar_Data\\Loop_{loop}_frames"
             os.makedirs(frame_dir, exist_ok=True)
             frame_count = 0
 
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
         # -- Game Loop --
         found = 0
-        while player.alive:
+        while True:
             ticks += 1
 
             if action == 0:
@@ -215,7 +216,7 @@ if __name__ == '__main__':
                 lidar.render()
                 pygame.display.flip()
                 clock.tick(board.fps)
-                pygame.image.save(pygame.display.get_surface(), f"{frame_dir}/frame_{frame_count:04d}.png")
+                pygame.image.save(pygame.display.get_surface(), f"{frame_dir}\\frame_{frame_count:04d}.png")
                 frame_count += 1
 
             next_state = get_state(board, player).unsqueeze(0)
@@ -266,9 +267,9 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), f"Lidar_Data\\Loop_{loop}_Model.pkl")
             images = []
             for i in range(frame_count):
-               filename = f"{frame_dir}/frame_{i:04d}.png"
+               filename = f"{frame_dir}\\frame_{i:04d}.png"
                images.append(iio.v3.imread(filename))
-               imageio.mimsave(f"Data/Loop_{loop}_render.gif", images, fps=board.fps)
+               imageio.mimsave(f"Lidar_Data\\Loop_{loop}_render.gif", images, fps=board.fps)
 
         with open("Lidar_Data\\Values.txt", "a", newline="") as f:
             f.write(f'\n{loop}\t{round(player.score, 6):.6f}\t{player.found}\t{ticks}\t{epsilon}')

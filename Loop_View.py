@@ -18,7 +18,7 @@ board_surf = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
 '''
-with open('Data\\Loop_4000_Training_Data.txt', 'r') as f:
+with open('Lidar_Data\\Loop_4000_Training_Data.txt', 'r') as f:
     vals = f.readlines()
     data = []
 
@@ -46,8 +46,8 @@ with open('Data\\Loop_4000_Training_Data.txt', 'r') as f:
         clock.tick(fps)
 '''
 
-avg = 250
-qv = 500
+avg = 500
+qv = 1000
 loop = []
 loop_avg = []
 loop_qv = []
@@ -62,7 +62,7 @@ ticks_avg = []
 ticks_qv = []
 epsilon = []
 
-with open("Data\\Values.txt", "r") as f:
+with open("Lidar_Data\\Values.txt", "r") as f:
     data = f.readlines()
     for i in range(2, len(data)-1):
         vals = list(data[i].split())
